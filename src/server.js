@@ -1,10 +1,13 @@
 import express from 'express'
-import { config } from 'dotenv'
-config()
+import main from './routers/index.js'
+import { configDotenv } from 'dotenv'
+
+configDotenv()
 
 const app = express()
 app.use(express.json())
+app.use(main)
 
 app.listen(process.env.PORT, ()=>{
-    console.log("Server is running")
+    console.log(`Server is running`)
 })
