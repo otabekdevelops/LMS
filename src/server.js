@@ -1,12 +1,33 @@
 import express from 'express'
 import main from './routers/index.js'
 import { configDotenv } from 'dotenv'
+import fs from 'fs'
+import { join } from 'path'
 
 configDotenv()
 
 const app = express()
 app.use(express.json())
 app.use(main)
+
+app.use((error, req, res, next) => {
+    console.log(error.status,error.message)
+    if (error.status < 500){
+        return res.status(error.status).json({
+            status : error.status,
+            message : error.message
+        })
+    } else {
+        
+        res.status(error.status).json({
+            status : error.status,
+            message : "Internal Server Error"
+        })
+        fs.appendFileSync(join(process.cwd(),"src", "log","logger.txt"),
+            `[${new Date()}]-${req.method}-${req.url}-${error.message}\n`
+        )
+    }
+})
 
 app.listen(process.env.PORT, ()=>{
     console.log(`Server is running`)

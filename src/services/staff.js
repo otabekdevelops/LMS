@@ -1,16 +1,15 @@
 import pool from "../config/db.js"
 import argon2 from "argon2"
+import { BadRequestError, ConflictError, InternalServerError, ValidationError } from "../utils/error.js"
 class StaffService{
     constructor(){}
 
-    async createStaff(req){
-        const {fullname, phone, password, role} = req.body
-        let existUser = await pool.query(`select id from staff where phone=${phone}`)
+    async createStaff(req, res, next){
+        try {
+            const {fullname, phone, password, role} = req.body
+        let existUser = await pool.query(`select * from staff where phone=$1`,[phone])
         if (existUser.rows.length){
-            return {
-                status : 409,
-                message : "User already exist with this phone number"
-            }
+            return next(new ConflictError(409, "User not found with this phone"))
         }
         let hashpass = await argon2.hash(password)
         await pool.query(`insert into staff(fullname, phone, password, role) values ($1,$2,$3,$4)`,[fullname, phone, hashpass, role])
@@ -18,13 +17,22 @@ class StaffService{
             status : 201,
             message : "User successfully created"
         }
+        } catch (error) {
+            return next(new InternalServerError(500, error)) 
+        }
+        
     }
 
-    async getAllstaff(req){
-        let data = await pool.query("select id, fullname, phone, role, status from staff where status='active' ")
-        return {
-            status: 200,
-            data : data.rows
+    async getAllstaff(req,res,next){
+        try {
+            let data = await pool.query("select id, fullname, phone, role, status from staff where status='active' ")
+            console.log(a)
+            return {
+                status: 200,
+                data : data.rows
+            }
+        } catch (error) {
+            return next(new InternalServerError(500, error)) 
         }
     }
 
@@ -36,14 +44,11 @@ class StaffService{
             data : staff.rows
         }
     }
-    async delete(req,res){
+    async delete(req,res,next){
         let { id } = req.params
         let result = await pool.query(`update staff set status = $1 where id = $2`,['inactive', id])
         if (!result.rows.length){
-            return {
-                status : 409,
-                message : "No user found with given id"
-            }
+            return next(new BadRequestError(400, "No user found with given id"))
         }
         return {
             status : 204,
