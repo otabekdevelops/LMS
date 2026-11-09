@@ -1,6 +1,6 @@
 import pool from "../config/db.js"
 import argon2 from "argon2"
-import { BadRequestError, ConflictError, InternalServerError, ValidationError } from "../utils/error.js"
+import { ErrorException } from "../utils/error.js"
 class StaffService{
     constructor(){}
 
@@ -9,7 +9,7 @@ class StaffService{
             const {fullname, phone, password, role} = req.body
         let existUser = await pool.query(`select * from staff where phone=$1`,[phone])
         if (existUser.rows.length){
-            return next(new ConflictError(409, "User not found with this phone"))
+            return next(new ErrorException(409, "User not found with this phone"))
         }
         let hashpass = await argon2.hash(password)
         await pool.query(`insert into staff(fullname, phone, password, role) values ($1,$2,$3,$4)`,[fullname, phone, hashpass, role])
@@ -18,7 +18,7 @@ class StaffService{
             message : "User successfully created"
         }
         } catch (error) {
-            return next(new InternalServerError(500, error)) 
+            return next(new ErrorException(500, error)) 
         }
         
     }
@@ -32,7 +32,7 @@ class StaffService{
                 data : data.rows
             }
         } catch (error) {
-            return next(new InternalServerError(500, error)) 
+            return next(new ErrorException(500, error)) 
         }
     }
 
@@ -48,7 +48,7 @@ class StaffService{
         let { id } = req.params
         let result = await pool.query(`update staff set status = $1 where id = $2`,['inactive', id])
         if (!result.rows.length){
-            return next(new BadRequestError(400, "No user found with given id"))
+            return next(new ErrorException(400, "No user found with given id"))
         }
         return {
             status : 204,
