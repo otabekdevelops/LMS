@@ -3,7 +3,7 @@ import { configDotenv } from 'dotenv'
 configDotenv()
 
 export function AccessToken(payload) {
-    return JWT.sign(payload, process.env.SECRET_KEY, { expiresIn: "15m" })
+    return JWT.sign(payload, process.env.SECRET_KEY, { expiresIn: "1h" })
 }
 
 export function RefreshToken(payload) {

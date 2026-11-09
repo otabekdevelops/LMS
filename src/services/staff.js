@@ -9,7 +9,7 @@ class StaffService{
             const {fullname, phone, password, role} = req.body
         let existUser = await pool.query(`select * from staff where phone=$1`,[phone])
         if (existUser.rows.length){
-            return next(new ErrorException(409, "User not found with this phone"))
+            return next(new ErrorException(409, "User already exist"))
         }
         let hashpass = await argon2.hash(password)
         await pool.query(`insert into staff(fullname, phone, password, role) values ($1,$2,$3,$4)`,[fullname, phone, hashpass, role])
@@ -26,7 +26,6 @@ class StaffService{
     async getAllstaff(req,res,next){
         try {
             let data = await pool.query("select id, fullname, phone, role, status from staff where status='active' ")
-            console.log(a)
             return {
                 status: 200,
                 data : data.rows
@@ -38,12 +37,13 @@ class StaffService{
 
     async getbyid(req,res){
         let { id } = req.params
-        let staff = await pool.query(`select * from staff where id=${id}`)
+        let staff = await pool.query(`select id, fullname, phone, role, status from staff where id=$1`, [id])
         return {
             status : 200,
             data : staff.rows
         }
     }
+
     async delete(req,res,next){
         let { id } = req.params
         let result = await pool.query(`update staff set status = $1 where id = $2`,['inactive', id])
