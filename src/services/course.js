@@ -1,5 +1,4 @@
 import pool from "../config/db.js"
-import argon2 from "argon2"
 import { ErrorException } from "../utils/error.js"
 class CourseService{
     constructor(){}
@@ -12,7 +11,7 @@ class CourseService{
             return next(new ErrorException(409, "The given name is already in use"))
         }
 
-        await pool.query(`insert into staff(banner, intro_video, name, description, price, category_id) 
+        await pool.query(`insert into courses(banner, intro_video, name, description, price, category_id) 
             values ($1,$2,$3,$4,$5,$6)`,[banner, intro_video, name, description, price, category_id])
         return {
             status : 201,
