@@ -5,14 +5,14 @@ class SectionService{
 
     async createSection(req, res, next){
         try {
-            const {banner, intro_video, name, description, price, category_id } = req.body
+            const { name, course_id } = req.body
         let result = await pool.query(`select * from sections where name=$1`,[name])
         if (result.rows.length){
             return next(new ErrorException(409, "The given name is already in use"))
         }
 
-        await pool.query(`insert into sections(banner, intro_video, name, description, price, category_id) 
-            values ($1,$2,$3,$4,$5,$6)`,[banner, intro_video, name, description, price, category_id])
+        await pool.query(`insert into sections(name, course_id) 
+            values ($1,$2)`,[name, course_id])
         return {
             status : 201,
             message : "Section successfully created"

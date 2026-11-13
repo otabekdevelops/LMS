@@ -6,12 +6,12 @@ class CourseService{
     async createCategory(req, res, next){
         try {
             const { name } = req.body
-        let result = await pool.query(`select * from category where name=$1`,[name])
+        let result = await pool.query(`select * from categories where name=$1`,[name])
         if (result.rows.length){
             return next(new ErrorException(409, "The given name is already in use"))
         }
 
-        await pool.query(`insert into category( name ) values ($1)`,[ name ])
+        await pool.query(`insert into categories( name ) values ($1)`,[ name ])
         return {
             status : 201,
             message : "Category successfully created"

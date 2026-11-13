@@ -5,14 +5,14 @@ class LessonService{
 
     async createLesson(req, res, next){
         try {
-            const {banner, intro_video, name, description, price, category_id } = req.body
+            const { section_id, name, description, file } = req.body
         let result = await pool.query(`select * from lessons where name=$1`,[name])
         if (result.rows.length){
             return next(new ErrorException(409, "The given name is already in use"))
         }
 
-        await pool.query(`insert into lessons(banner, intro_video, name, description, price, category_id) 
-            values ($1,$2,$3,$4,$5,$6)`,[banner, intro_video, name, description, price, category_id])
+        await pool.query(`insert into lessons(section_id, name, description, file) 
+            values ($1,$2,$3,$4)`,[section_id, name, description, file])
         return {
             status : 201,
             message : "Lesson successfully created"
@@ -25,7 +25,7 @@ class LessonService{
 
     async getAlllessons(req,res,next){
         try {
-            let data = await pool.query("select * from lessons where status='active' ")
+            let data = await pool.query("select * from lessons")
             return {
                 status: 200,
                 data : data.rows

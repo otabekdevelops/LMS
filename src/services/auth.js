@@ -8,7 +8,15 @@ class AuthService {
         try {
             let { phone, password } = req.body
         
-            let result = await pool.query("select * from staff where phone=$1",[phone])
+            const result = await pool.query(
+            `select id, fullname, phone, password, role, status from staff where phone = $1
+             union all
+             select id, fullname, phone, password, 'teacher' as role, status from teachers where phone = $1
+             union all
+             select id, fullname, phone, password, 'student' as role, status from students where phone = $1`,
+            [phone]
+        )
+            
 
             let user = result.rows[0]
             if (!user) {
@@ -18,7 +26,6 @@ class AuthService {
             if(!await argon2.verify(user.password, password)) {
                 return next(new ErrorException(400, "Incorrect password or phone number"))
             }
-            console.log("Buyergacha keldi", user)
 
         return {
             status : 201,

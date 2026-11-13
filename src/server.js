@@ -11,22 +11,23 @@ app.use(express.json())
 app.use(main)
 
 app.use((error, req, res, next) => {
-    console.log(error.status,error.message)
-    if (error.status < 500){
-        return res.status(error.status).json({
-            status : error.status,
-            message : error.message
+    const status = error.status || 500
+    console.log(status, error.message)
+
+    if (status < 500) {
+        return res.status(status).json({
+            status,
+            message: error.message
         })
-    } else {
-        
-        res.status(error.status).json({
-            status : error.status,
-            message : "Internal Server Error"
-        })
-        fs.appendFileSync(join(process.cwd(),"src", "log","logger.txt"),
-            `[${new Date()}]-${req.method}-${req.url}-${error.message}\n`
-        )
     }
+
+    fs.appendFileSync(join(process.cwd(), "src", "log", "logger.txt"),
+        `[${new Date()}]-${req.method}-${req.url}-${error.message}\n`
+    )
+    return res.status(500).json({
+        status: 500,
+        message: "Internal Server Error"
+    })
 })
 
 app.listen(process.env.PORT, ()=>{

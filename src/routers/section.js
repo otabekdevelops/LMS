@@ -6,8 +6,8 @@ import { roleGuard } from '../guards/role.guard.js'
 const router = express.Router()
 
 router
-    .post("/create", authGuard, roleGuard("admin"),sectionController.create)
-    .get("/getAll", authGuard, roleGuard("admin"), sectionController.getAllsections)
+    .post("/create", authGuard, roleGuard("admin","teacher"),sectionController.create)
+    .get("/getAll", authGuard, roleGuard("admin","teacher"), sectionController.getAllsections)
     .get("/getbyid/:id", authGuard, roleGuard("admin"), sectionController.getbyid)
     .delete("/delete/:id", authGuard, roleGuard("admin"), sectionController.delete)
 

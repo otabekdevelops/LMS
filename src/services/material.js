@@ -5,14 +5,10 @@ class MaterialService{
 
     async createMaterial(req, res, next){
         try {
-            const {banner, intro_video, name, description, price, category_id } = req.body
-        let result = await pool.query(`select * from materials where name=$1`,[name])
-        if (result.rows.length){
-            return next(new ErrorException(409, "The given name is already in use"))
-        }
+            const { lesson_id, description, file } = req.body
 
-        await pool.query(`insert into materials(banner, intro_video, name, description, price, category_id) 
-            values ($1,$2,$3,$4,$5,$6)`,[banner, intro_video, name, description, price, category_id])
+        await pool.query(`insert into materials(lesson_id, description, file) 
+            values ($1,$2,$3)`,[lesson_id, description, file])
         return {
             status : 201,
             message : "Material successfully created"
@@ -25,7 +21,7 @@ class MaterialService{
 
     async getAllmaterials(req,res,next){
         try {
-            let data = await pool.query("select * from materials where status='active' ")
+            let data = await pool.query("select * from materials")
             return {
                 status: 200,
                 data : data.rows
@@ -46,7 +42,7 @@ class MaterialService{
 
     async delete(req,res,next){
         let { id } = req.params
-        let result = await pool.query(`update materials set status = $1 where id = $2`,['inactive', id])
+        let result = await pool.query("delete from tasks where id=$1", [id])
         if (!result.rows.length){
             return next(new ErrorException(400, "No material found with given id"))
         }

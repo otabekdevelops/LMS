@@ -7,6 +7,8 @@ import categoryRouter from "./category.js"
 import lessonRouter from "./lesson.js"
 import sectionRouter from "./section.js"
 import materialRouter from "./material.js"
+import taskRouter from "./task.js"
+import buyCourseRouter from "./buyCourse.js"
 import { Router } from 'express'
 
 const main = Router()
@@ -17,8 +19,11 @@ main.use("/api/v1/teacher", teacherRouter)
 main.use("/api/v1/student", studentRouter)
 main.use("/api/v1/course", courseRouter)
 main.use("/api/v1/category", categoryRouter)
-main.use("/api/v1/lessom", lessonRouter)
+main.use("/api/v1/lesson", lessonRouter)
 main.use("/api/v1/section", sectionRouter)
 main.use("/api/v1/material", materialRouter)
+main.use("/api/v1/task", taskRouter)
+main.use("/api/v1/buy", buyCourseRouter)
+
 
 export default main
